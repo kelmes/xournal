@@ -1,3 +1,4 @@
 Xournal - experimental version that removes dependency of gnome-canvas
+Currently only accepts drawing input from a graphics tablet/stylus
 
 See also: http://sourceforge.net/projects/xournal
