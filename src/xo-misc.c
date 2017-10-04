@@ -666,8 +666,9 @@ void fix_xinput_coords(GdkEvent *event)
   GdkDevice *device;
   int wx, wy, sx, sy, ix, iy;
   TRACE_1("To be implemented\n");
-  assert(0);
+//  assert(0);
 #ifdef ABC
+  printf("def abc\n");
   if (event->type == GDK_BUTTON_PRESS || event->type == GDK_BUTTON_RELEASE) {
     axes = event->button.axes;
     px = &(event->button.x);
@@ -723,8 +724,9 @@ void fix_xinput_coords(GdkEvent *event)
   }
 #endif
 #else
-  fprintf(stderr, "This function needs to be ported...failing...");
-  exit(1);
+  // This should mostly work now, do nothing
+  //fprintf(stderr, "This function needs to be ported...failing...");
+  //exit(1);
 #endif
 
 
@@ -1615,8 +1617,9 @@ void update_mappings_menu_linkings(void)
 
 void update_mappings_menu(void)
 {
-  gtk_widget_set_sensitive(GET_COMPONENT("optionsButtonMappings"), ui.use_xinput);
-  gtk_widget_set_sensitive(GET_COMPONENT("optionsPressureSensitive"), ui.use_xinput);
+  // don't follow the xinput setting, we aren't using it in wayland.
+  gtk_widget_set_sensitive(GET_COMPONENT("optionsButtonMappings"), TRUE);
+  gtk_widget_set_sensitive(GET_COMPONENT("optionsPressureSensitive"), TRUE);
   gtk_check_menu_item_set_active(
     GTK_CHECK_MENU_ITEM(GET_COMPONENT("optionsButtonMappings")), ui.use_erasertip);
   gtk_check_menu_item_set_active(

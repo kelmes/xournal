@@ -320,7 +320,7 @@ void create_new_stroke(GdkEvent *event)
   }
 }
 
-void continue_stroke(GdkEvent *event)
+void continue_stroke(GdkEventMotion *event)
 {
   GooCanvasPoints seg;
   double *pt, current_width;
@@ -370,13 +370,12 @@ void continue_stroke(GdkEvent *event)
 			  "fill-color-rgba", ui.cur_item->brush.color_rgba,
 			  "width-units", current_width, NULL);
 #else
-    /*
     goo_canvas_polyline_new_line(ui.cur_item->canvas_item, 
 				 pt[0], pt[1], pt[2], pt[3],
 				 "line-width", current_width, 
 				 NULL);
 
-    */
+    
 #ifndef do_not_speedup_strokes
     // goocanvas is slow at drawing, so we go directly to the heart
     // and do the rendering on the canvas using cairo. This drawing is

@@ -254,6 +254,10 @@ typedef struct Selection {
 } Selection;
 
 typedef struct UIData {
+  GdkDevice *current_stroke_device;
+  GdkDevice *draw_device;
+  GtkGesture *zoom_gesture;
+  double initial_zoom;
   int pageno, layerno; // the current page and layer
   struct Page *cur_page;
   struct Layer *cur_layer;

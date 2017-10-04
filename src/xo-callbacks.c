@@ -2616,22 +2616,23 @@ on_canvas_button_press_event           (GtkWidget       *widget,
 #endif
   // this check seems to be a safety one to make sure we don't get into
   // weird recursive changes
-  if (ui.cur_item_type != ITEM_NONE) 
-    return FALSE; // we're already doing something
+  //if (ui.cur_item_type != ITEM_NONE) 
+  //  return FALSE; // we're already doing something
 
   // if button_switch_mapping enabled, button 2 or 3 clicks only switch mapping
-  if (ui.button_switch_mapping && event->button > 1) {
-    ui.which_unswitch_button = event->button;
-    switch_mapping(event->button-1);
-    return FALSE;
-  }
+  //if (ui.button_switch_mapping && event->button > 1) {
+  //  ui.which_unswitch_button = event->button;
+  //  switch_mapping(event->button-1);
+  //  return FALSE;
+  //}
+
 
 #ifdef adfadsf
   ui.is_corestroke = is_core;
 #endif
   ui.stroke_device = event->device;
 
-  if (ui.use_erasertip && gdk_device_get_source(event->device) == GDK_SOURCE_ERASER)
+  if (ui.use_erasertip && gdk_device_get_source(gdk_event_get_source_device((GdkEvent*)event)) == GDK_SOURCE_ERASER)
     mapping = NUM_BUTTONS;
   else if (ui.button_switch_mapping) {
     mapping = ui.cur_mapping;
@@ -2698,7 +2699,11 @@ on_canvas_button_press_event           (GtkWidget       *widget,
   } 
   else if (ui.toolno[mapping] == TOOL_PEN || ui.toolno[mapping] == TOOL_HIGHLIGHTER ||
         (ui.toolno[mapping] == TOOL_ERASER && ui.cur_brush->tool_options == TOOLOPT_ERASER_WHITEOUT)) {
-    create_new_stroke((GdkEvent *)event);
+    if (inputSource == GDK_SOURCE_PEN) {
+      create_new_stroke(event);
+      ui.current_stroke_device=event->device;
+    }
+
   } 
   else if (ui.toolno[mapping] == TOOL_ERASER) {
     ui.cur_item_type = ITEM_ERASURE;
@@ -2741,7 +2746,7 @@ on_canvas_button_release_event         (GtkWidget       *widget,
   is_core = xo_event_button_device_is_core(event);
 //(event->device == xo_device_get_core_pointer());
 
-  if (!ui.use_xinput && !is_core) return FALSE;
+  //if (!ui.use_xinput && !is_core) return FALSE;
   if (ui.use_xinput && is_core && !ui.is_corestroke) return FALSE;
   if (ui.ignore_other_devices && ui.stroke_device!=event->device) return FALSE;
   if (!is_core) fix_xinput_coords((GdkEvent *)event);
@@ -2939,7 +2944,7 @@ on_canvas_motion_notify_event          (GtkWidget       *widget,
 
   is_core = xo_event_motion_device_is_core(event);
 
-  if (!ui.use_xinput && !is_core) return FALSE;
+  //if (!ui.use_xinput && !is_core) return FALSE;
   if (!is_core) fix_xinput_coords((GdkEvent *)event);
   if (!finite_sized(event->x) || !finite_sized(event->y)) return FALSE; // Xorg 7.3 bug
 
@@ -2995,9 +3000,10 @@ on_canvas_motion_notify_event          (GtkWidget       *widget,
   }
   
   if (ui.cur_item_type == ITEM_STROKE) {
-    continue_stroke((GdkEvent *)event);
+    if (event->device == ui.current_stroke_device)
+      continue_stroke(event);
   }
-  else if (ui.cur_item_type == ITEM_ERASURE) {
+  else if (ui.cur_item_type == ITEM_ERASURE ) {
     do_eraser((GdkEvent *)event, ui.cur_brush->thickness/2,
                ui.cur_brush->tool_options == TOOLOPT_ERASER_STROKES);
   }

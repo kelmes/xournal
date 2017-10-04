@@ -74,6 +74,22 @@ xo_subscribe_gestures(GtkWidget *window, GtkWidget *scroller) {
 }
 #endif
 
+void zoom_gesture_begin(GtkGesture *gesture, GdkEventSequence *sequence, GtkWidget *canvas) {
+	printf("beginning test\n");
+	ui.initial_zoom = ui.zoom;
+}
+
+void zoom_gesture_scale_changed(GtkGestureZoom *gesture, gdouble scale, GtkWidget *canvas) {
+	printf("scale changed test\n");
+
+	printf("scale: %f\n", scale);
+	ui.zoom = ui.initial_zoom * scale;
+	xo_canvas_set_pixels_per_unit();
+	update_page_stuff();
+}
+
+
+
 
 void xo_describe_device(GdkDevice* device)
 {
@@ -247,6 +263,7 @@ void init_stuff (int argc, char *argv[])
 
   allow_all_accels();
   add_scroll_bindings();
+
 
   // prevent interface items from stealing focus
   // glade doesn't properly handle can_focus, so manually set it
@@ -482,6 +499,10 @@ void init_stuff (int argc, char *argv[])
   doesIt = gtk_scrolled_window_get_kinetic_scrolling (  GTK_SCROLLED_WINDOW(w));
   printf("Scrolling, kinetic [%d]\n", doesIt);
 
+  // gtk gestures
+  ui.zoom_gesture = gtk_gesture_zoom_new(GTK_WIDGET(w));
+  g_signal_connect(ui.zoom_gesture, "begin", G_CALLBACK(zoom_gesture_begin), w);
+  g_signal_connect(ui.zoom_gesture, "scale-changed", G_CALLBACK (zoom_gesture_scale_changed), w);
 
   // load the MRU
   
@@ -509,6 +530,7 @@ void init_stuff (int argc, char *argv[])
     gtk_widget_destroy(w);
   }
 }
+
 
 int
 main (int argc, char *argv[])
